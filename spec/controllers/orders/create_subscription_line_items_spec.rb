@@ -48,7 +48,7 @@ RSpec.describe Spree::Controllers::Orders::CreateSubscriptionLineItems, type: :c
             end_date: Date.parse('2000/10/11'),
             subscribable_id: variant.id,
             interval_length: 30,
-            interval_units: "day"
+            interval_units: "days"
           }
         }
       end

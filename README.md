@@ -48,8 +48,8 @@ To subscribe to a variant include the following parameters when posting to
       quantity: 2,              // number of units in each subscription order.
       subscribable_id: 1234,    // Which variant the subscription is for.
       interval_length: 1,       // The time between subscription activations.
-      interval_units: "month", // A plural qualifier for length.
-                                // Can be one of "day", "week", "month", or "year".
+      interval_units: "months", // A plural qualifier for length.
+                                // Can be one of "days", "weeks", "months", or "years".
       end_date: '2011/12/13'     // Stop processing after this date
                                 // (use null to process the subscription ad nauseam)
     }
@@ -73,9 +73,9 @@ subscription.
 
 An order is finalized and has following associated subscription line items:
 
-1. { subscribable_id: 1, interval_length: 1, interval_units: 'month'}
-2. { subscribable_id: 2, interval_length: 1, interval_units: 'month' }
-3. { subscribable_id: 1, interval_length: 2, interval_units: 'month' }
+1. { subscribable_id: 1, interval_length: 1, interval_units: 'months'}
+2. { subscribable_id: 2, interval_length: 1, interval_units: 'months' }
+3. { subscribable_id: 1, interval_length: 2, interval_units: 'months' }
 
 This will generate 2 Subscriptions objects. The first related to
 subscription_line_items 1 & 2. The second  related to line item 3.

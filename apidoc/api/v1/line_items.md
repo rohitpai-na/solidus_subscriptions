@@ -21,7 +21,7 @@ subscription.
           "quantity": 1,          // How many to include in the subscription orders
           "end_date": "2012/12/12", // When to stop processing the subscription (null for ad nauseam)
           "interval_length": 1,
-          "interval_units": "month", // one of: day, week, month, year
+          "interval_units": "months", // one of: days, weeks, months, years
           "subscribable_id": 1234 // What item to include in the subscription order
         }]
       }]

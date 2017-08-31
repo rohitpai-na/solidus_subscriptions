@@ -7,10 +7,10 @@ module SolidusSubscriptions
   module Interval
     def self.included(base)
       base.enum interval_units: {
-        day: 0,
-        week: 1,
-        month: 2,
-        year: 3
+        days: 0,
+        weeks: 1,
+        months: 2,
+        years: 3
       }
     end
 

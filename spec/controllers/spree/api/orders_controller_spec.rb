@@ -38,7 +38,7 @@ RSpec.describe Spree::Api::OrdersController, type: :controller do
         quantity: 1,
         subscribable_id: variant.id,
         interval_length: 30,
-        interval_units: "day"
+        interval_units: "days"
       }
     end
 

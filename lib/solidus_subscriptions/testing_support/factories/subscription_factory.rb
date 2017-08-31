@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :subscription, class: 'SolidusSubscriptions::Subscription' do
     store
     interval_length 1
-    interval_units :month
+    interval_units :months
 
     user do
       create(:user, :subscription_user).tap do |user|

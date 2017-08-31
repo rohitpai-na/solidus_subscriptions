@@ -16,7 +16,7 @@ cart page alongside Spree::LineItems.
   "subscription_line_item": {
     "quantity": 21,          // number of units in each subscription order,
     "interval_length": 1,
-    "interval_units": "month", // one of: day, week, month, year
+    "interval_units": "months", // one of: days, weeks, months, years
 
     "end_date": "2012/12/12"   // Stop processing after this date (null for ad nauseam)
   }
@@ -37,7 +37,7 @@ configurable) except for the :subscribable_id. These atrributes are:
   "subscription_id": nil,
   "quantity": 21,
   "interval_length": 1,
-  "interval_units": "month",
+  "interval_units": "months",
   "interval": 2592000,
   "end_date": "2012/12/12",
   "subscribable_id": 2,

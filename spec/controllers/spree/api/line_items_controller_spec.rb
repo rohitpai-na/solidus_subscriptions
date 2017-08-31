@@ -43,7 +43,7 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
             end_date: '1990/10/12',
             subscribable_id: variant.id,
             interval_length: 30,
-            interval_units: "day"
+            interval_units: "days"
           }
         }
       end
@@ -85,7 +85,7 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
           end_date: '1990/10/12',
           subscribable_id: variant.id,
           interval_length: 30,
-          interval_units: "day"
+          interval_units: "days"
         }
       }
     end
