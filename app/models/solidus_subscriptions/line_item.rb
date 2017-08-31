@@ -16,7 +16,6 @@
 # [Integer] :installments How many subscription orders should be placed
 module SolidusSubscriptions
   class LineItem < ActiveRecord::Base
-    include Interval
 
     belongs_to :spree_line_item, class_name: 'Spree::LineItem', inverse_of: :subscription_line_items
     has_one :order, through: :spree_line_item, class_name: 'Spree::Order'
@@ -25,6 +24,8 @@ module SolidusSubscriptions
       class_name: 'SolidusSubscriptions::Subscription',
       inverse_of: :line_items
     )
+
+    interval_enum length_attr: true
 
     validates :subscribable_id, presence: :true
     validates :quantity, numericality: { greater_than: 0 }
