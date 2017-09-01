@@ -86,7 +86,7 @@ module SolidusSubscriptions
     #   the conditions are met.
     # [inactive] The number of installments has been fulfilled. The subscription
     #   will no longer be processed
-    state_machine :state, initial: :active do
+    state_machine :state, initial: :pending do
       event :cancel do
         transition [:active, :pending_cancellation] => :canceled,
           if: ->(subscription) { subscription.can_be_canceled? }
@@ -102,7 +102,8 @@ module SolidusSubscriptions
       end
 
       event :activate do
-        transition any - [:active] => :active
+        transition any - [:active] => :active,
+          if: ->(subscription) { subscription.can_be_activated? }
       end
 
       after_transition to: :active, do: :advance_actionable_date
@@ -138,6 +139,11 @@ module SolidusSubscriptions
       return if errors.any?
 
       advance_actionable_date
+    end
+
+    def can_be_activated?
+      (line_item.end_date ? actionable_date > line_item.end_date : true) &&
+          line_item.spree_line_item.shipment.can_be_activated?
     end
 
     # This method determines if a subscription can be deactivated. A deactivated
