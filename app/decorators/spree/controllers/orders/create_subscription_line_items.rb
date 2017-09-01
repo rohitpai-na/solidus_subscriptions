@@ -15,7 +15,7 @@ module Spree
           base.after_action(
             :handle_subscription_line_items,
             only: :populate,
-            if: ->{ params[:subscription_line_item] }
+            if: ->{ params[:subscription_line_item] && params[:subscription_line_item][:quantity] && params[:subscirption_line_item][:quantity] > 0 }
           )
         end
 
