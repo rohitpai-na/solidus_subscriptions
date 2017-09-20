@@ -27,6 +27,21 @@ en:
             activate: Activate
             skip: Skip One
 
+      subscription_presets:
+        edit:
+          back: Back to Subscription Preset List
+          title: Edit Subscription Preset
+        index:
+          activate: Activate
+          deactivate: Deactivate
+          new_subscription_preset: New Subscription Preset
+          show_inactive: Show Inactive
+          title: Subscription Preset List
+        new:
+          back: Back to Subscription Preset List
+          title: Create a Subscription Preset
+        show:
+          title: Subscription Preset Details
       subscriptions:
         successfully_canceled: Subsciption Canceled!
         successfully_activated: Subsciption Activated!
@@ -40,7 +55,7 @@ en:
           status: Status
           fulfillment_status: Fulfillment Status
           revenue: Revenue
-          interval: Interval
+          interval: Delivery Interval
         new:
           back: Back to Subscriptions List
           title: Create a Susbcription
@@ -48,6 +63,7 @@ en:
           subscription: Subscription
           subscription_line_item: Subscription Line Item
       tab:
+        subscription_presets: Subscription Presets
         subscriptions: Subscriptions
     promotion_rule_types:
       subscription_promotion_rule:

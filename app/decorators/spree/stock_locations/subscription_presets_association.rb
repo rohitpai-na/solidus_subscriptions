@@ -9,6 +9,10 @@ module Spree
         base.has_many :subscription_presets, 
                       class_name: "SolidusSubscriptions::SubscriptionPreset",
                       inverse_of: :stock_location
+
+        base.has_many :active_subscription_presets,
+                      -> { where SolidusSubscriptions::SubscriptionPreset.arel_table[:active].eq(true) },
+                      class_name: "SolidusSubscriptions::SubscriptionPreset"
       end
     end
   end

@@ -1,0 +1,8 @@
+<ul class="admin-subnav" data-hook="admin_subscription_sub_tabs">
+  <% if can? :admin, SolidusSubscriptions::Subscription %>
+    <%= tab :subscriptions, match_path: '/subscriptions' %>
+  <% end %>
+  <% if can? :admin, SolidusSubscriptions::SubscriptionPreset %>
+    <%= tab :subscription_presets, match_path: '/subscription_presets' %>
+  <% end %>
+</ul>

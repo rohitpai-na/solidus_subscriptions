@@ -15,11 +15,13 @@ RSpec.describe Spree::Controllers::Orders::CreateSubscriptionLineItems, type: :c
     subject { post :populate, params: params }
 
     let!(:variant) { create :variant }
+    let!(:subscription_preset) { create :subscription_preset, variant: variant }
     let(:params) { line_item_params }
     let(:line_item_params) do
       {
         quantity: 1,
-        variant_id: variant.id
+        # variant_id: variant.id
+        subscription_preset_id: subscription_preset.id
       }
     end
 
@@ -46,9 +48,10 @@ RSpec.describe Spree::Controllers::Orders::CreateSubscriptionLineItems, type: :c
           subscription_line_item: {
             quantity: 2,
             end_date: Date.parse('2000/10/11'),
-            subscribable_id: variant.id,
-            interval_length: 30,
-            interval_units: "days"
+            subscription_preset_id: subscription_preset.id
+            # subscribable_id: variant.id,
+            # interval_length: 30,
+            # interval_units: "days"
           }
         }
       end

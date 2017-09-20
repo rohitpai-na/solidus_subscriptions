@@ -9,6 +9,8 @@ RSpec.describe Spree::Api::UsersController, type: :controller do
     create(:user) { |user| user.generate_spree_api_key }.tap(&:save)
   end
   let!(:subscription) { create :subscription, :with_line_item, user: user }
+  let!(:variant) { create :variant }
+  let!(:subscription_preset) { create :subscription_preset, variant: variant }
 
   describe 'patch /update' do
     subject { patch :update, params: params }
@@ -31,8 +33,9 @@ RSpec.describe Spree::Api::UsersController, type: :controller do
       {
         id: subscription.line_item_ids.first,
         quantity: 6,
-        interval_length: 1,
-        interval_units: 'months'
+        subscription_preset_id: subscription_preset.id
+        # interval_length: 1,
+        # interval_units: 'months'
       }
     end
 

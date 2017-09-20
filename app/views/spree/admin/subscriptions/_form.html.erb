@@ -21,35 +21,6 @@
       <%= f.text_field :actionable_date, class: "fullwidth datepicker" %>
     <% end %>
 
-    <div class='field three columns'>
-      <%= f.label :inverval_length %>
-      <%= f.number_field :interval_length, class: "fullwidth" %>
-    </div>
-
-    <div class='field three columns'>
-      <%= f.label :interval_units %>
-      <%
-        unit_values = SolidusSubscriptions::LineItem.interval_units.keys
-        units = unit_values.map do |unit|
-          [
-            unit,
-            SolidusSubscriptions::LineItem.human_attribute_name("interval_units.#{ unit }")
-          ]
-        end
-      %>
-
-      <div>
-        <% units.each_with_index do |(value, name), i| %>
-          <div>
-            <%= f.label :interval_units, for: "interval_units_#{ value }", class: 'fullwidth' do %>
-              <%= f.radio_button :interval_units, value, id: "interval_units_#{ value }" %>
-              <%= name %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
     <div class="field omega three columns">
       <%= f.label :end_date %>
       <%= f.date_field :end_date, class: "required fullwidth" %>
@@ -67,8 +38,8 @@
         </div>
 
         <div class="field columns ten omega">
-          <%= lf.label :subscribable_id %>
-          <%= lf.collection_select :subscribable_id, Spree::Variant.where(subscribable: true), :id, :pretty_name, {}, { class: "fullwidth select2" } %>
+          <%= lf.label :subscription_preset_id %>
+          <%= lf.collection_select :subscription_preset_id, @subscription_presets, :id, :name, {}, { class: "fullwidth select2" } %>
         </div>
       </div>
 

@@ -5,15 +5,15 @@ module ActiveSupport
     SECONDS_PER_HALFYEAR = 15778476
 
     PARTS_IN_SECONDS = {
-      seconds: 1,
-      minutes: SECONDS_PER_MINUTE,
-      hours:   SECONDS_PER_HOUR,
-      days:    SECONDS_PER_DAY,
-      weeks:   SECONDS_PER_WEEK,
-      months:  SECONDS_PER_MONTH,
-      quarters: SECONDS_PER_QUARTER,
+      seconds:   1,
+      minutes:   SECONDS_PER_MINUTE,
+      hours:     SECONDS_PER_HOUR,
+      days:      SECONDS_PER_DAY,
+      weeks:     SECONDS_PER_WEEK,
+      months:    SECONDS_PER_MONTH,
+      quarters:  SECONDS_PER_QUARTER,
       halfyears: SECONDS_PER_HALFYEAR,
-      years:   SECONDS_PER_YEAR
+      years:     SECONDS_PER_YEAR
     }.freeze
 
     PARTS = [:years, :halfyears, :quarters, :months, :weeks, :days, :hours, :minutes, :seconds].freeze
@@ -73,6 +73,9 @@ module ActiveRecord
       months:    3,
       weeks:     4,
       days:      5,
+      hours:     6,
+      minutes:   7,
+      seconds:   8
     }.freeze
 
     def self.interval_enum(definition = {})
@@ -105,13 +108,11 @@ module ActiveRecord
 
       define_method(interval_method) do
 
-        return nil if length_attr.blank? || units_attr.blank?
+        return nil if length_attr.blank? || self.send(length_attr).blank? || units_attr.blank? || self.send(units_attr).blank?
         ActiveSupport::Duration.new(
           self.send(length_attr) * 
             ActiveSupport::Duration::PARTS_IN_SECONDS[self.send(units_attr).to_s.pluralize.to_sym], 
-          { 
-            self.send(units_attr).pluralize.to_sym => self.send(length_attr)
-          }
+          { self.send(units_attr).pluralize.to_sym => self.send(length_attr) }
         )
       end if length_attr
     end

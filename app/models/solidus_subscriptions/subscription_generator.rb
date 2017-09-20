@@ -4,57 +4,37 @@ module SolidusSubscriptions
   module SubscriptionGenerator
     extend self
 
-    SubscriptionConfiguration = Struct.new(:interval_length, :interval_units, :end_date)
-
     # Create and persist a subscription for a collection of subscription
     #   line items
     #
-    # @param subscription_line_items [Array<SolidusSubscriptions::LineItem>] The
-    #   subscription_line_items to be activated
+    # @param subscription_line_item [SolidusSubscriptions::LineItem] The
+    #   subscription_line_item to be activated
     #
     # @return [SolidusSubscriptions::Subscription]
-    def activate(subscription_line_items)
-      return if subscription_line_items.empty?
+    def activate(subscription_line_item)
+      Rails.logger.debug "******************** subscription_generator #{__method__}"
+      return if subscription_line_item.blank?
 
-      order = subscription_line_items.first.order
-      configuration = subscription_configuration(subscription_line_items.first)
+      subscription_preset = subscription_line_item.priceable
+      return if subscription_preset.blank?
 
+      subscription_line_item = SolidusSubscriptions::LineItem.find(subscription_line_item.id)
       subscription_attributes = {
-        user: order.user,
-        line_items: subscription_line_items,
-        store: order.store,
-        shipping_address: order.ship_address,
-        **configuration.to_h
+        line_item: subscription_line_item,
+        subscription_preset: subscription_preset,
+        supplier_id: subscription_preset.supplier_id
       }
+      Rails.logger.debug "******************** subscription_generator #{subscription_attributes.inspect}"
 
-      Subscription.create!(subscription_attributes) do |sub|
-        sub.actionable_date = sub.next_actionable_date
+      if subscription_line_item.subscription.present?
+      # if (subscription = Subscription.find_by(line_item_id: subscription_line_item.id))
+        Rails.logger.debug "******************** subscription_generator update"
+        subscription_line_item.subscription.update(subscription_attributes)
+      else
+        Rails.logger.debug "******************** subscription_generator create"
+        Subscription.create!(subscription_attributes)
       end
     end
 
-    # Group a collection of line items by common subscription configuration
-    # options. Grouped subscription_line_items can belong to a single
-    # subscription.
-    #
-    # @param subscription_line_items [Array<SolidusSubscriptions::LineItem>] The
-    #   subscription_line_items to be grouped.
-    #
-    # @return [Array<Array<SolidusSubscriptions::LineItem>>]
-    def group(subscription_line_items)
-      subscription_line_items.group_by do |li|
-        subscription_configuration(li)
-      end.
-      values
-    end
-
-    private
-
-    def subscription_configuration(subscription_line_item)
-      SubscriptionConfiguration.new(
-        subscription_line_item.interval_length,
-        subscription_line_item.interval_units,
-        subscription_line_item.end_date
-      )
-    end
   end
 end

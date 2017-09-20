@@ -6,26 +6,39 @@ module SolidusSubscriptions
 
     PROCESSING_STATES = [:pending, :failed, :success]
 
-    belongs_to :user, class_name: Spree.user_class
-    has_many :line_items, class_name: 'SolidusSubscriptions::LineItem', inverse_of: :subscription
+    belongs_to :line_item, 
+      class_name: "SolidusSubscriptions::LineItem", 
+      inverse_of: :subscription
+
+    belongs_to :subscription_preset,
+      class_name: "SolidusSubscriptions::SubscriptionPreset",
+      inverse_of: :subscriptions
+
+    has_one :order, through: :line_item
+
+    has_one :user, through: :order
+
     has_many :installments, class_name: 'SolidusSubscriptions::Installment'
-    belongs_to :store, class_name: 'Spree::Store'
-    belongs_to :shipping_address, class_name: 'Spree::Address'
 
-    interval_enum length_attr: true
+    has_many :state_changes, class_name: "Spree::StateChange", as: :stateful
 
-    validates :user, presence: :true
-    validates :skip_count, :successive_skip_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
-    validates :interval_length, numericality: { greater_than: 0 }
+    belongs_to :supplier,
+      class_name: 'Spree::Supplier',
+      inverse_of: :subscriptions
 
-    accepts_nested_attributes_for :shipping_address
-    accepts_nested_attributes_for :line_items, allow_destroy: true
+    # validates :skip_count, :successive_skip_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
-    # The following methods are delegated to the associated
-    # SolidusSubscriptions::LineItem
-    #
-    # :quantity, :subscribable_id
-    delegate :quantity, :subscribable_id, to: :line_item
+    # accepts_nested_attributes_for :shipping_address
+    # accepts_nested_attributes_for :line_item, allow_destroy: true
+
+    delegate :quantity, :variant, to: :line_item
+
+    delegate :delivery_interval, :delivery_interval_units, :delivery_interval_length,
+      :bill_interval, :bill_interval_units, :bill_interval_length,
+      :contract_interval, :contract_interval_units, :contract_interval_length,
+      :interval, :interval_units, :interval_length,
+      :unit_price, :unit_price_interval_units, :unit_price_interval_length,
+      to: :subscription_preset
 
     # Find all subscriptions that are "actionable"; that is, ones that have an
     # actionable_date in the past and are not invalid or canceled.
@@ -77,7 +90,8 @@ module SolidusSubscriptions
     # processed. Here is a brief description of the states and how they affect
     # the subscription.
     #
-    # [active] Default state when created. Subscription can be processed
+    # [pending] Default state when created.
+    # [active] Shipment has been delivered/installed. Subscription can be processed
     # [canceled] The user has ended their subscription. Subscription will not
     #   be processed.
     # [pending_cancellation] The user has ended their subscription, but the
@@ -88,25 +102,32 @@ module SolidusSubscriptions
     #   will no longer be processed
     state_machine :state, initial: :pending do
       event :cancel do
-        transition [:active, :pending_cancellation] => :canceled,
+        transition [:pending, :active, :pending_cancellation] => :canceled,
           if: ->(subscription) { subscription.can_be_canceled? }
 
         transition active: :pending_cancellation
       end
-
-      after_transition to: :canceled, do: :advance_actionable_date
+      after_transition to: :canceled, do: [:advance_actionable_date, :after_cancel]
 
       event :deactivate do
         transition active: :inactive,
           if: ->(subscription) { subscription.can_be_deactivated? }
       end
+      after_transition to: :inactive, do: :after_deactivate
 
       event :activate do
         transition any - [:active] => :active,
           if: ->(subscription) { subscription.can_be_activated? }
       end
+      after_transition to: :active, do: [:advance_actionable_date, :after_activate]
 
-      after_transition to: :active, do: :advance_actionable_date
+      after_transition do |subscription, transition|
+        subscription.state_changes.create!(
+          previous_state: transition.from,
+          next_state:     transition.to,
+          name:           'subscription'
+        )
+      end
     end
 
     # This method determines if a subscription may be canceled. Canceled
@@ -142,9 +163,24 @@ module SolidusSubscriptions
     end
 
     def can_be_activated?
-      (line_item.end_date ? actionable_date > line_item.end_date : true) &&
-          line_item.spree_line_item.shipment.can_be_activated?
+      (end_date ? actionable_date > end_date : true) &&
+          line_item.inventory_units.first.shipment.associated_subscription_can_be_activated?
     end
+
+    def was_active?
+      state_changes.exists?(next_state: :active)
+    end
+
+    def was_canceled?
+      state_changes.exists?(next_state: :canceled) &&
+        state_changes.where(next_state: :canceled).last.created_at >
+          (state_changes.where(next_state: :active).last.try(:created_at) || 0)
+    end
+
+    def was_not_canceled?
+      !was_canceled?
+    end
+
 
     # This method determines if a subscription can be deactivated. A deactivated
     # subscription will not be processed. By default a subscription can be
@@ -154,7 +190,7 @@ module SolidusSubscriptions
     # should not be processed again. Subscriptions without an end_date
     # value cannot be deactivated.
     def can_be_deactivated?
-      active? && line_item.end_date && actionable_date > line_item.end_date
+      active? && end_date && actionable_date > end_date
     end
 
     # Get the date after the current actionable_date where this subscription
@@ -166,7 +202,7 @@ module SolidusSubscriptions
     def next_actionable_date
       return nil unless active?
       new_date = (actionable_date || Time.zone.now)
-      (new_date + interval).beginning_of_minute
+      (new_date + (delivery_interval || bill_interval)).beginning_of_minute
     end
 
     # Advance the actionable date to the next_actionable_date value. Will modify
@@ -185,7 +221,7 @@ module SolidusSubscriptions
     #
     # @return [SolidusSubscriptions::LineItemBuilder]
     def line_item_builder
-      LineItemBuilder.new(line_items)
+      LineItemBuilder.new(line_item)
     end
 
     # The state of the last attempt to process an installment associated to
@@ -197,6 +233,17 @@ module SolidusSubscriptions
     def processing_state
       return 'pending' if installments.empty?
       installments.last.fulfilled? ? 'success' : 'failed'
+    end
+
+    # Placeholder methods
+
+    def after_cancel
+    end
+
+    def after_activate
+    end
+
+    def after_deactivate
     end
 
     private
@@ -217,8 +264,5 @@ module SolidusSubscriptions
       end
     end
 
-    def line_item
-      line_items.first
-    end
   end
 end

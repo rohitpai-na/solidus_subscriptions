@@ -117,23 +117,23 @@ RSpec.describe Spree::Admin::SubscriptionsController, type: :request do
     end
   end
 
-  describe 'POST skip' do
-    subject { post spree.skip_admin_subscription_path(subscription) }
+  # describe 'POST skip' do
+  #   subject { post spree.skip_admin_subscription_path(subscription) }
 
-    let(:subscription) { create :subscription, :actionable, :with_line_item }
-    let!(:expected_date) { subscription.next_actionable_date }
+  #   let(:subscription) { create :subscription, :actionable, :with_line_item }
+  #   let!(:expected_date) { subscription.next_actionable_date }
 
-    it { is_expected.to redirect_to spree.admin_subscriptions_path }
+  #   it { is_expected.to redirect_to spree.admin_subscriptions_path }
 
-    it 'has a message' do
-      subject
-      expect(flash[:notice]).to be_present
-    end
+  #   it 'has a message' do
+  #     subject
+  #     expect(flash[:notice]).to be_present
+  #   end
 
-    it 'advances the actioanble_date' do
-      expect { subject }.
-        to change { subscription.reload.actionable_date }.
-        from(subscription.actionable_date).to(expected_date)
-    end
-  end
+  #   it 'advances the actioanble_date' do
+  #     expect { subject }.
+  #       to change { subscription.reload.actionable_date }.
+  #       from(subscription.actionable_date).to(expected_date)
+  #   end
+  # end
 end

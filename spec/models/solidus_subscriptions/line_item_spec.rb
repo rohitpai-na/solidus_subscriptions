@@ -5,12 +5,14 @@ RSpec.describe SolidusSubscriptions::LineItem, type: :model do
   it { is_expected.to belong_to :subscription }
   it { is_expected.to have_one :order }
 
-  it { is_expected.to validate_presence_of :subscribable_id }
+  # it { is_expected.to validate_presence_of :subscribable_id }
+  it { is_expected.to belong_to :subscription_preset }
 
   it { is_expected.to validate_numericality_of(:quantity).is_greater_than(0) }
-  it { is_expected.to validate_numericality_of(:interval_length).is_greater_than(0) }
+  # it { is_expected.to validate_numericality_of(:interval_length).is_greater_than(0) }
 
-  describe "#interval" do
+  # describe "#interval" do
+  describe "#delivery_interval"
     let(:line_item) { create :subscription_line_item, :with_subscription }
     before do
       Timecop.freeze(Date.parse("2016-09-22"))
@@ -18,7 +20,8 @@ RSpec.describe SolidusSubscriptions::LineItem, type: :model do
     end
     after { Timecop.return }
 
-    subject { line_item.interval }
+    # subject { line_item.interval }
+    subject { line_item.delivery_interval }
 
     it { is_expected.to be_a ActiveSupport::Duration }
     it "calculates the duration correctly" do
@@ -39,11 +42,12 @@ RSpec.describe SolidusSubscriptions::LineItem, type: :model do
         "subscription_id" => line_item.subscription_id,
         "quantity" => line_item.quantity,
         "end_date" => line_item.end_date,
-        "subscribable_id" => line_item.subscribable_id,
+        # "subscribable_id" => line_item.subscribable_id,
         "created_at" => line_item.created_at,
         "updated_at" => line_item.updated_at,
-        "interval_units" => line_item.interval_units,
-        "interval_length" => line_item.interval_length
+        "subscription_preset_id" => line_item.subscription_preset_id
+        # "interval_units" => line_item.interval_units,
+        # "interval_length" => line_item.interval_length
       }
     end
 
@@ -100,57 +104,57 @@ RSpec.describe SolidusSubscriptions::LineItem, type: :model do
     end
   end
 
-  describe "#update_actionable_date_if_interval_changed" do
-    let(:subscription) { create :subscription }
-    let(:line_item) { create :subscription_line_item, subscription: subscription, interval_length: 3, interval_units: "months" }
+  # describe "#update_actionable_date_if_interval_changed" do
+  #   let(:subscription) { create :subscription }
+  #   let(:line_item) { create :subscription_line_item, subscription: subscription, interval_length: 3, interval_units: "months" }
 
-    before do
-      Timecop.freeze(Date.parse("2016-09-22"))
-      line_item.subscription.update!(actionable_date: 1.month.ago)
-    end
-    after { Timecop.return }
+  #   before do
+  #     Timecop.freeze(Date.parse("2016-09-22"))
+  #     line_item.subscription.update!(actionable_date: 1.month.ago)
+  #   end
+  #   after { Timecop.return }
 
-    subject { line_item.update!(interval_length: 1, interval_units: "months") }
+  #   subject { line_item.update!(interval_length: 1, interval_units: "months") }
 
-    context "with installments" do
-      before do
-        create(:installment, subscription: subscription, created_at: last_installment_date)
-      end
+  #   context "with installments" do
+  #     before do
+  #       create(:installment, subscription: subscription, created_at: last_installment_date)
+  #     end
 
-      context "when the last installment date would cause the interval to be in the past" do
-        let(:last_installment_date) { 2.months.ago }
-        it "sets the actionable_date to the current day" do
-          subject
-          expect(subscription.actionable_date).to eq Time.zone.now
-        end
-      end
+  #     context "when the last installment date would cause the interval to be in the past" do
+  #       let(:last_installment_date) { 2.months.ago }
+  #       it "sets the actionable_date to the current day" do
+  #         subject
+  #         expect(subscription.actionable_date).to eq Time.zone.now
+  #       end
+  #     end
 
-      context "when the last installment date would cause the interval to be in the future" do
-        let(:last_installment_date) { 4.days.ago }
-        it "sets the actionable_date to an interval from the last installment" do
-          subject
-          expect(subscription.actionable_date).to eq 1.month.from_now(last_installment_date)
-        end
-      end
-    end
+  #     context "when the last installment date would cause the interval to be in the future" do
+  #       let(:last_installment_date) { 4.days.ago }
+  #       it "sets the actionable_date to an interval from the last installment" do
+  #         subject
+  #         expect(subscription.actionable_date).to eq 1.month.from_now(last_installment_date)
+  #       end
+  #     end
+  #   end
 
-    context "when there are no installments" do
-      context "when the subscription creation date would cause the interval to be in the past" do
-        before do
-          subscription.update(created_at: 4.months.ago)
-        end
-        it "sets the actionable_date to one interval past the subscription creation date" do
-          subject
-          expect(subscription.actionable_date).to eq Time.zone.now
-        end
-      end
+  #   context "when there are no installments" do
+  #     context "when the subscription creation date would cause the interval to be in the past" do
+  #       before do
+  #         subscription.update(created_at: 4.months.ago)
+  #       end
+  #       it "sets the actionable_date to one interval past the subscription creation date" do
+  #         subject
+  #         expect(subscription.actionable_date).to eq Time.zone.now
+  #       end
+  #     end
 
-      context "when the subscription creation date would cause the interval to be in the future" do
-        it "sets the actionable_date to one interval past the subscription creation date" do
-          subject
-          expect(subscription.actionable_date).to eq Date.parse("2016-10-22")
-        end
-      end
-    end
-  end
+  #     context "when the subscription creation date would cause the interval to be in the future" do
+  #       it "sets the actionable_date to one interval past the subscription creation date" do
+  #         subject
+  #         expect(subscription.actionable_date).to eq Date.parse("2016-10-22")
+  #       end
+  #     end
+  #   end
+  # end
 end

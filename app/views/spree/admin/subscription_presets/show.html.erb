@@ -1,0 +1,7 @@
+<% admin_breadcrumb(t('.title')) %>
+
+<%= form_for [:admin, @subscription_preset] do |f| %>
+  <fieldset class="no-border-top">
+    <%= render partial: 'disabled_form', locals: { f: f } %>
+  </fieldset>
+<% end %>

@@ -1,0 +1,136 @@
+<% admin_layout "full-width" %>
+
+<% admin_breadcrumb(t('.title')) %>
+
+<% content_for :page_actions do %>
+  <% if can?(:create, SolidusSubscriptions::SubscriptionPreset) %>
+    <li id="new_subscription_preset_link">
+      <%= button_link_to t('.new_subscription_preset'), new_object_url, { id: 'admin_new_subscription_preset' } %>
+    </li>
+  <% end %>
+<% end if can?(:create, SolidusSubscriptions::SubscriptionPreset) %>
+
+<% content_for :table_filter_title do %>
+  <%= Spree.t(:search) %>
+<% end %>
+
+<% content_for :table_filter do %>
+  <div data-hook="admin_subscription_presets_sidebar">
+    <%= search_form_for [:admin, @search] do |f| %>
+        <%- locals = {f: f} %>
+        <div data-hook="admin_subscription_presets_index_search" >
+          <div class="row" >
+            <div class="col-3">
+              <div class="field">
+                <%= f.label :name_cont, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:name_cont) %>
+                <%= f.text_field :name_cont, size: 15 %>
+              </div>
+            </div>
+
+            <div data-hook="new_subscription_preset_stock_location" class="col-4">
+              <div class="field">
+                <%= label_tag :stock_location, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:stock_location) %>
+                <%= f.collection_select :stock_location_id_in, @stock_locations, :id, :name_and_code_and_zipcode, { include_blank: true }, { multiple: true, class: "select2 fullwidth" } %>
+              </div>
+            </div>
+
+            <div class="col-2">
+              <div class="field checkbox">
+                <label>
+                  <%= f.check_box :with_inactive, { checked: params[:q][:with_inactive] == 'true' }, 'true', 'false' %>
+                  <%= t('.show_inactive') %>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <% if try_spree_current_user.try(:admin?) %>
+            <div class="row">
+              <div data-hook="new_subscription_preset_supplier" class="col-4">
+                <div class="field">
+                  <%= label_tag :supplier_id, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:supplier) %>
+                  <%= f.collection_select :supplier_id_in, Spree::Supplier.select(:id, :name).all, :id, :name, { include_blank: true }, { multiple: true, class: "select2 fullwidth" } %>
+                </div>
+              </div>
+
+              <div class="col-2">
+                <div class="field checkbox">
+                  <label>
+                    <%= f.check_box :with_deleted, { checked: params[:q][:with_deleted] == 'true' }, 'true', 'false' %>
+                    <%= Spree.t(:show_deleted) %>
+                  </label>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="actions filter-actions" data-hook="admin_subscription_presets_index_search_buttons">
+          <%= button Spree.t(:search) %>
+        </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div id="new_subscription_preset_wrapper" data-hook></div>
+
+<%= paginate @collection, theme: "solidus_admin" %>
+
+<% if @collection.any? %>
+  <table class="index" id="listing_subscription_presets">
+    <thead>
+      <tr data-hook="admin_subscription_presets_index_headers">
+        <th><%= sort_link @search,:name, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:name), {}, {title: 'admin_subscription_presets_listing_name_title'} %></th>
+        <th><%= sort_link @search,:variant_name, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:variant_name), {}, {title: 'admin_subscription_presets_listing_variant_name_title'} %></th>
+        <% if try_spree_current_user.admin? %>
+          <th><%= Spree.t(:supplier_name) %></th>
+        <% end %>
+        <th><%= sort_link @search,:name_and_code_and_zipcode, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:stock_location) %></th>
+        <th><%= sort_link @search,:payment_mode, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:payment_mode) %></th>
+        <th><%= sort_link @search,:bill_interval, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_interval) %></th>
+        <th><%= sort_link @search,:bill_price, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_price) %></th>
+        <th><%= sort_link @search,:delivery_category, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:delivery_category) %></th>
+        <th><%= sort_link @search,:delivery_interval, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:delivery_interval) %></th>
+        <th><%= sort_link @search,:active, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:active) %></th>
+        <th data-hook="admin_subscription_presets_index_header_actions" class="actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @collection.each do |subscription_preset| %>
+          <tr <%== "style='color: red;'" if subscription_preset.deleted? %> id="<%= spree_dom_id subscription_preset %>" data-hook="admin_subscription_presets_index_rows" class="<%= cycle('odd', 'even') %>">
+            <td class="align-center"><%= link_to subscription_preset.name, admin_subscription_preset_path(subscription_preset) %></td>
+            <td class="align-center"><%= "#{subscription_preset.variant.name}\n#{subscription_preset.variant.sku_and_options_text}" %></td>
+            <% if try_spree_current_user.admin? %>
+              <td class="align-center"><%= subscription_preset.supplier.name %></td>
+            <% end %>
+            <td class="align-center"><%= subscription_preset.stock_location.name_and_code_and_zipcode %></td>
+            <td class="align-center"><%= subscription_preset.payment_mode %></td>
+            <td class="align-center"><%= subscription_preset.bill_interval.inspect %></td>
+            <td class="align-center"><%= subscription_preset.bill_price %></td>
+            <td class="align-center"><%= subscription_preset.delivery_category %></td>
+            <td class="align-center"><%= subscription_preset.delivery_interval ? subscription_preset.delivery_interval.inspect : nil %></td>
+            <td class="align-center"><%= subscription_preset.active ? "Yes" : "No" %></td>
+            <td class="actions" data-hook="admin_subscription_presets_index_row_actions">
+              <% if !subscription_preset.deleted? && subscription_preset.active == false && can?(:activate, subscription_preset) %>
+                <%= link_to_with_icon 'ok', t('.activate'), activate_admin_subscription_preset_path(subscription_preset), method: :put, no_text: true %>
+              <% elsif !subscription_preset.deleted? && subscription_preset.active == true && can?(:deactivate, subscription_preset) %>
+                <%= link_to_with_icon 'cancel', t('.deactivate'), deactivate_admin_subscription_preset_path(subscription_preset), method: :put, no_text: true %>
+              <% end %>
+              <%= link_to_edit subscription_preset, no_text: true, class: 'edit' if can?(:edit, subscription_preset) && !subscription_preset.deleted? %>
+              &nbsp;
+              <%= link_to_delete subscription_preset, no_text: true if can?(:delete, subscription_preset) && !subscription_preset.deleted? %>
+            </td>
+          </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="col-9 no-objects-found">
+    <%= render 'spree/admin/shared/no_objects_found',
+                  resource: SolidusSubscriptions::SubscriptionPreset,
+                  new_resource_url: new_object_url %>
+  </div>
+<% end %>
+
+<%= paginate @collection, theme: "solidus_admin" %>

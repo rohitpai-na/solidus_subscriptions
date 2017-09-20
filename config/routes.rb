@@ -1,16 +1,16 @@
-SolidusSubscriptions::Engine.routes.draw do
-  namespace :api do
-    namespace :v1 do
-      resources :line_items, only: [:update, :destroy]
-      resources :subscriptions, only: [:update] do
-        member do
-          post :cancel
-          post :skip
-        end
-      end
-    end
-  end
-end
+# SolidusSubscriptions::Engine.routes.draw do
+#   namespace :api do
+#     namespace :v1 do
+#       # resources :line_items, only: [:update, :destroy]
+#       resources :subscriptions, only: [:update] do
+#         member do
+#           post :cancel
+#           # post :skip
+#         end
+#       end
+#     end
+#   end
+# end
 
 Spree::Core::Engine.routes.draw do
   mount SolidusSubscriptions::Engine, at: '/subscriptions'
@@ -19,7 +19,12 @@ Spree::Core::Engine.routes.draw do
     resources :subscriptions, only: [:index, :new, :create, :edit, :update] do
       delete :cancel, on: :member
       post :activate, on: :member
-      post :skip, on: :member
+      # post :skip, on: :member
+    end
+
+    resources :subscription_presets do
+      put :activate, on: :member
+      put :deactivate, on: :member
     end
   end
 end

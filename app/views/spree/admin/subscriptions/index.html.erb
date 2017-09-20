@@ -4,10 +4,10 @@
   <% content_for(:page_title, SolidusSubscriptions::Subscription.model_name.human) %>
 <% end %>
 
-<% content_for :page_actions do %>
-  <li><%= button_link_to t('.new_subscription'), new_admin_subscription_path %></li>
-<% end %>
-
+<!-- < content_for :page_actions do >
+  <li><= button_link_to t('.new_subscription'), new_admin_subscription_path ></li>
+< end >
+ -->
 <% content_for :table_filter_title do %>
   <%= Spree.t(:search) %>
 <% end %>
@@ -101,7 +101,7 @@
         <th><%= sort_link(@search, :created_at, SolidusSubscriptions::Subscription.human_attribute_name(:created_at)) %></th>
         <th><%= sort_link(@search, :user_email, SolidusSubscriptions::Subscription.human_attribute_name(:user)) %></th>
         <th><%= sort_link(@search, :actionable_date, SolidusSubscriptions::Subscription.human_attribute_name(:actionable_date)) %></th>
-        <th><%= sort_link(@search, :line_item_interval_length, SolidusSubscriptions::Subscription.human_attribute_name(:interval)) %></th>
+        <th><%= sort_link(@search, :subscription_preset_name, SolidusSubscriptions::Subscription.human_attribute_name(:subscription_preset_name)) %></th>
         <th><%= sort_link(@search, :state, SolidusSubscriptions::Subscription.human_attribute_name(:state)) %></th>
         <th><%= sort_link(@search, :processing_state, SolidusSubscriptions::Subscription.human_attribute_name(:processing_state)) %></th>
         <th class='actions'></th>

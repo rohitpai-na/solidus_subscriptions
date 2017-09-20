@@ -26,6 +26,10 @@ module SolidusSubscriptions
         ]
       end
 
+      def subscription_preset_attributes
+        [Config.subscription_preset_attributes]
+      end
+
       private
 
       def nested(attributes)

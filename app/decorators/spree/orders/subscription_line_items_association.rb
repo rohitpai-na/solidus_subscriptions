@@ -6,7 +6,8 @@ module Spree
   module Orders
     module SubscriptionLineItemsAssociation
       def self.prepended(base)
-        base.has_many :subscription_line_items, through: :line_items
+        base.has_many :subscription_line_items, class_name: "SolidusSubscriptions::LineItem"
+        base.has_many :subscriptions, through: :subscription_line_items, source: :subscription
       end
     end
   end

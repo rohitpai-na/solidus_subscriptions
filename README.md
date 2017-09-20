@@ -45,13 +45,10 @@ To subscribe to a variant include the following parameters when posting to
   {
     // other add to cart params
     subscription_line_item: {
-      quantity: 2,              // number of units in each subscription order.
-      subscribable_id: 1234,    // Which variant the subscription is for.
-      interval_length: 1,       // The time between subscription activations.
-      interval_units: "months", // A plural qualifier for length.
-                                // Can be one of "days", "weeks", "months", or "years".
-      end_date: '2011/12/13'     // Stop processing after this date
-                                // (use null to process the subscription ad nauseam)
+      quantity: 2,                // number of units in each subscription order.
+      subscription_preset_id: 3,  // the Subscription Preset that has the subscribable, billing, delivery cycles etc.
+      end_date: '2011/12/13'      // Stop processing after this date
+                                  // (use null to process the subscription ad nauseam)
     }
   }
 ```
@@ -68,17 +65,6 @@ the subscription line item with your existing cart infrastructure.
 When the order is finalized, a `SolidusSubscriptions::Subscription` will be
 created for each group of subscription line items which can be fulfilled by a single
 subscription.
-
-#### Example:
-
-An order is finalized and has following associated subscription line items:
-
-1. { subscribable_id: 1, interval_length: 1, interval_units: 'months'}
-2. { subscribable_id: 2, interval_length: 1, interval_units: 'months' }
-3. { subscribable_id: 1, interval_length: 2, interval_units: 'months' }
-
-This will generate 2 Subscriptions objects. The first related to
-subscription_line_items 1 & 2. The second  related to line item 3.
 
 ### Processing Subscriptions
 

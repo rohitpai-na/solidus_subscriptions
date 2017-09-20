@@ -7,6 +7,7 @@ RSpec.describe Spree::Api::OrdersController, type: :controller do
 
   let(:order) { create :order }
   let(:variant) { create :variant }
+  let!(:subscription_preset) { create :subscription_preset, variant: variant }
 
   describe 'patch /update' do
     subject(:subscription_line_items) do
@@ -36,9 +37,10 @@ RSpec.describe Spree::Api::OrdersController, type: :controller do
     let(:subscription_line_items_params) do
       {
         quantity: 1,
-        subscribable_id: variant.id,
-        interval_length: 30,
-        interval_units: "days"
+        subscription_preset_id: subscription_preset.id
+        # subscribable_id: variant.id,
+        # interval_length: 30,
+        # interval_units: "days"
       }
     end
 

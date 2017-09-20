@@ -6,11 +6,19 @@ module Spree
   module Orders
     module FinalizeCreatesSubscriptions
       def finalize!
-        SolidusSubscriptions::SubscriptionGenerator.group(subscription_line_items).each do |line_items|
-          SolidusSubscriptions::SubscriptionGenerator.activate(line_items)
-        end
-
+        Rails.logger.debug "******************** subscription #{__method__}"
         super
+        Rails.logger.debug "******************** back in subscription #{__method__}"
+        create_or_update_subscription
+      end
+
+      # Spree::Order.register_update_hook :create_or_update_subscription
+
+      def create_or_update_subscription
+        Rails.logger.debug "******************** subscription #{__method__}"
+        subscription_line_items.each do |line_item|
+          SolidusSubscriptions::SubscriptionGenerator.activate(line_item)
+        end
       end
     end
   end

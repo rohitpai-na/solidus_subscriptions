@@ -27,14 +27,19 @@ module SolidusSubscriptions
       app.config.spree.promotions.rules << 'SolidusSubscriptions::SubscriptionOrderPromotionRule'
     end
 
+    # initializer 'register_subscription_preset_as_priceable', after: 'spree.register.priceables' do |app|
+    #   app.config.spree.priceables << 'Spree::SubscriptionPreset'
+    # end      
+
     initializer 'subscriptions_backend' do
       next unless Spree::Backend::Config.respond_to?(:menu_items)
       Spree::Backend::Config.configure do |config|
         config.menu_items << config.class::MenuItem.new(
-          [:subscriptions],
+          [:subscriptions, :subscription_presets],
           'repeat',
           url: :admin_subscriptions_path,
-          condition: ->{ can?(:admin, SolidusSubscriptions::Subscription) }
+          condition: ->{ can?(:admin, SolidusSubscriptions::Subscription) },
+          partial: 'spree/admin/shared/subscription_sub_menu'
         )
       end
     end

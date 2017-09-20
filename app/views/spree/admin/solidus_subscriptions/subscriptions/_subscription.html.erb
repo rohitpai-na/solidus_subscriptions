@@ -10,7 +10,7 @@
   <% end %>
 
   <%= content_tag :td, class: 'align-center' do %>
-    <%= subscription.interval.inspect %>
+    <%= link_to subscription.subscription_preset.name, admin_subscription_preset_path(subscription.subscription_preset) %>
   <% end %>
 
   <%= content_tag :td, class: 'align-center' do %>
@@ -24,7 +24,7 @@
   <% end %>
 
   <td class="actions align-center">
-    <% if subscription.state_events.include?(:cancel) %>
+    <% if subscription.state_events.include?(:cancel) && can?(:delete, subscription)%>
       <%=
         link_to_with_icon(
           :stop,
@@ -37,7 +37,7 @@
       %>
     <% end %>
 
-    <% if subscription.state_events.include?(:activate) %>
+    <% if subscription.state_events.include?(:activate) && can?(:activate, subscription) %>
       <%=
         link_to_with_icon(
           :play,
@@ -49,18 +49,8 @@
       %>
     <% end %>
 
-    <% if subscription.active? %>
-      <%=
-        link_to_with_icon(
-          :'fast-forward',
-          t('.skip'),
-          spree.skip_admin_subscription_path(subscription),
-          no_text: true,
-          method: :post
-        )
-      %>
+    <% if can?(:update, subscription) %>
+      <%= link_to_edit(subscription, no_text: true) %>
     <% end %>
-
-    <%= link_to_edit(subscription, no_text: true) %>
   </td>
 <% end %>

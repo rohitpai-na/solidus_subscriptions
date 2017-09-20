@@ -79,8 +79,7 @@ module SolidusSubscriptions
       [
         :quantity,
         :subscribable_id,
-        :interval_length,
-        :interval_units,
+        :subscription_preset_id,
         :end_date
       ]
     end
@@ -91,6 +90,31 @@ module SolidusSubscriptions
       [
         :actionable_date,
         shipping_address_attributes: Spree::PermittedAttributes.address_attributes
+      ]
+    end
+
+    mattr_accessor(:subscription_preset_attributes) do
+      [
+        :name,
+        :payment_category,
+        :payment_mode,
+        :deposit_amount,
+        :deposit_refundable,
+        :deposit_due_time,
+        :bill_interval_units,
+        :bill_interval_length,
+        :bill_price,
+        :bill_price_due_time,
+        :bill_fine,
+        :delivery_category,
+        :delivery_interval_units,
+        :delivery_interval_length,
+        :unit_price,
+        :pro_rata,
+        :max_outstanding_amount,
+        :contract_interval_units,
+        :contract_interval_length,
+        :supplier_id
       ]
     end
   end

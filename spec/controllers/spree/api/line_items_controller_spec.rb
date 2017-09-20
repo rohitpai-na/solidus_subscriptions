@@ -10,6 +10,7 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
 
     let(:params) { line_item_params }
     let!(:variant) { create :variant }
+    let!(:subscription_preset) { create :subscription_preset, variant: variant }
     let!(:order) { create :order }
 
     let(:line_item_params) do
@@ -19,7 +20,8 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
         format: 'json',
         line_item: {
           quantity: 1,
-          variant_id: variant.id
+          # variant_id: variant.id
+          subscription_preset_id: subscription_preset.id
         }
       }
     end
@@ -41,9 +43,9 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
           subscription_line_item: {
             quantity: 2,
             end_date: '1990/10/12',
-            subscribable_id: variant.id,
-            interval_length: 30,
-            interval_units: "days"
+            # subscribable_id: variant.id,
+            # interval_length: 30,
+            # interval_units: "days"
           }
         }
       end
@@ -67,6 +69,7 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
 
     let(:params) { line_item_params }
     let!(:variant) { create :variant }
+    let!(:subscription_preset) { create :subscription_preset, variant: variant }
     let!(:order) { create :order }
     let!(:line_item) { create :line_item, order: order, variant: variant }
 
@@ -83,9 +86,10 @@ RSpec.describe Spree::Api::LineItemsController, type: :controller do
         subscription_line_item: {
           quantity: 2,
           end_date: '1990/10/12',
-          subscribable_id: variant.id,
-          interval_length: 30,
-          interval_units: "days"
+          subscription_preset_id: subscription_preset.id
+          # subscribable_id: variant.id,
+          # interval_length: 30,
+          # interval_units: "days"
         }
       }
     end

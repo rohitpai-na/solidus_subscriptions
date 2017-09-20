@@ -1,0 +1,181 @@
+
+  <%- is_admin = try_spree_current_user.try(:admin?) %>
+
+  <div data-hook="new_subscription_preset_attrs"> 
+    <div class="row">
+      <div class="col-6">
+        <div id="new_subscription_preset_name" class="field">
+          <%= f.field_container :name do %>
+            <%= label_tag :name, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:name), class: 'required' %>
+            <%= f.text_field :name, class: 'fullwidth title', disabled: true %>
+            <%= f.error_message_on :name %>
+          <% end %>
+        </div>
+
+        <div id="new_subscription_preset_description" class="field">
+          <%= f.field_container :description do %>
+            <%= label_tag :description, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:description), class: 'required' %>
+            <%= f.text_area :description, class: 'fullwidth title', disabled: true %>
+            <%= f.error_message_on :description %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-3">
+        <%= label_tag :stock_location_id, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:stock_location), class: 'required' %>
+        <%= f.select :stock_location_id, options_from_collection_for_select([@subscription_preset.stock_location], :id, :name_and_code_and_zipcode), {}, class: 'custom-select', disabled: true %>
+        <%= f.error_message_on :stock_location_id %>
+      </div>
+
+      <div class="field col-3">
+        <%= label_tag :variant_id, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:variant), class: 'required' %>
+        <%= f.select :variant_id, options_from_collection_for_select([@subscription_preset.variant], :id, :name_and_sku), {}, class: 'custom-select', disabled: true %>
+        <%= f.error_message_on :variant_id %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-3">
+        <%= label_tag :payment_category_label, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:payment_category), class: 'required' %>
+        <div> <%= f.select :payment_category, options_for_select(SolidusSubscriptions::SubscriptionPreset.payment_categories.keys, @subscription_preset.payment_category), {:prompt => "Select One"}, class: 'custom-select', disabled: true %> </div>
+      </div>
+
+      <div class="field col-3">
+        <%= label_tag :payment_mode_label, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:payment_mode), class: 'required' %>
+        <div> <%= f.select :payment_mode, options_for_select(SolidusSubscriptions::SubscriptionPreset.payment_modes.keys, @subscription_preset.payment_mode), {:prompt => "Select One"}, class: 'custom-select', disabled: true %> </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_deposit_amount" class="field col-3">
+        <%= f.field_container :deposit_amount do %>
+          <%= label_tag :deposit_amount, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:deposit_amount), class: 'required' %>
+          <%= f.number_field :deposit_amount, { value: @subscription_preset.deposit_amount || '0.00', step: 0.01, disabled: true } %>
+          <%= f.error_message_on :deposit_amount %>
+        <% end %>
+      </div>
+
+      <div id="new_subscription_preset_deposit_refundable" class="field col-3">
+        <%= f.field_container :deposit_refundable do %>
+          <%= label_tag :deposit_refundable, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:deposit_refundable), class: 'required' %>
+          <div> <%= f.label :deposit_refundable, "Yes" %> <%= f.radio_button :deposit_refundable, true, disabled: true %> </div>
+          <div> <%= f.label :deposit_refundable, "No" %> <%= f.radio_button :deposit_refundable, false, disabled: true %> </div>
+          <%= f.error_message_on :deposit_refundable %>
+        <% end %>
+      </div>
+
+      <div id="new_subscription_preset_deposit_due_time" class="field col-3">
+        <%= f.field_container :deposit_due_time do %>
+          <%= label_tag :deposit_due_time, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:deposit_due_time), class: 'required' %>
+          <%= f.number_field :deposit_due_time, { value: @subscription_preset.deposit_due_time || '0', step: 1, disabled: true } %>
+          <%= f.error_message_on :deposit_due_time %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_bill_interval" class="field col-3">
+        <%= label_tag :bill_interval_length, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_interval_length), class: 'required' %>
+        <%= f.number_field :bill_interval_length, { value: @subscription_preset.bill_interval_length || "1", step: 1 , disabled: true} %>
+        <%= f.error_message_on :bill_interval_length %>
+        <%= f.select :bill_interval_units, options_for_select(SolidusSubscriptions::SubscriptionPreset.bill_interval_units.keys, @subscription_preset.bill_interval_units || :months), {}, class: 'custom-select', disabled: true %>
+        <%= f.error_message_on :bill_interval_units %>
+      </div>
+
+      <div id="new_subscription_preset_bill_price" class="field col-3">
+        <%= f.field_container :bill_price do %>
+          <%= label_tag :bill_price, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_price) %>
+          <div> <%= f.number_field :bill_price, { value: @subscription_preset.bill_price || '', step: 0.01, disabled: true } %> </div>
+          <%= f.error_message_on :bill_price %>
+        <% end %>
+      </div>
+
+      <div id="new_subscription_preset_bill_price_due_time" class="field col-3">
+        <%= f.field_container :bill_price_due_time do %>
+          <%= label_tag :bill_price_due_time, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_price_due_time), class: 'required' %>
+          <%= f.number_field :bill_price_due_time, { value: @subscription_preset.bill_price_due_time || '0', step: 1, disabled: true } %>
+          <%= f.error_message_on :bill_price_due_time %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_max_outstanding_amount" class="field col-3">
+        <%= f.field_container :max_outstanding_amount do %>
+          <%= label_tag :max_outstanding_amount, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:max_outstanding_amount) %>
+          <%= f.number_field :max_outstanding_amount, { value: @subscription_preset.max_outstanding_amount || '', step: 0.01, disabled: true } %>
+          <%= f.error_message_on :max_outstanding_amount %>
+        <% end %>
+      </div>
+
+      <div id="new_subscription_preset_bill_fine" class="field col-3">
+        <%= f.field_container :bill_fine do %>
+          <%= label_tag :bill_fine, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:bill_fine) %>
+          <div> <%= f.number_field :bill_fine, { value: @subscription_preset.bill_fine || '', step: 0.01, disabled: true } %> </div>
+          <%= f.error_message_on :bill_fine %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_delivery_category" class="field col-3">
+        <%= label_tag :delivery_category_label, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:delivery_category), class: 'required' %>
+        <div> <%= f.select :delivery_category, options_for_select(SolidusSubscriptions::SubscriptionPreset.delivery_categories.keys, @subscription_preset.delivery_category), {:prompt => "Select One"}, class: 'custom-select', disabled: true %> </div>
+      </div>
+
+      <div id="new_subscription_preset_delivery_interval" class="field col-3">
+        <%= label_tag :delivery_interval_length, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:delivery_interval_length) %>
+        <%= f.number_field :delivery_interval_length, { value: @subscription_preset.delivery_interval_length, step: 1, disabled: true } %>
+        <%= f.error_message_on :delivery_interval_length %>
+        <%= f.select :delivery_interval_units, options_for_select(SolidusSubscriptions::SubscriptionPreset.delivery_interval_units.keys), {:include_blank => true}, class: 'custom-select', disabled: true %>
+        <%= f.error_message_on :delivery_interval_units %>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_pro_rata" class="field col-3">
+        <%= f.field_container :pro_rata do %>
+          <%= label_tag :pro_rata, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:pro_rata), class: 'required' %>
+          <div> <%= f.label :pro_rata, "Yes" %> <%= f.radio_button :pro_rata, true, disabled: true %> </div>
+          <div> <%= f.label :pro_rata, "No" %> <%= f.radio_button :pro_rata, false, disabled: true %> </div>
+          <%= f.error_message_on :pro_rata %>
+        <% end %>
+      </div>
+
+      <div id="new_subscription_preset_unit_price" class="field col-3">
+        <%= f.field_container :unit_price do %>
+          <%= label_tag :unit_price, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:unit_price), class: 'required' %>
+          <div> 
+            <%= f.number_field :unit_price, { value: @subscription_preset.unit_price || '', step: 0.01, disabled: true } %>
+            <br />per
+            <%= f.select :unit_price_interval_units, options_for_select(SolidusSubscriptions::SubscriptionPreset.unit_price_interval_units.keys, @subscription_preset.unit_price_interval_units), {:include_blank => true}, class: 'custom-select', disabled: true %>  
+          </div>
+          <%= f.error_message_on :unit_price %>
+          <%= f.error_message_on :unit_price_interval_units %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="new_subscription_preset_contract_interval" class="field col-3">
+        <%= label_tag :contract_interval_length, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:contract_interval_length), class: 'required' %>
+        <%= f.number_field :contract_interval_length, { value: @subscription_preset.contract_interval_length || nil, step: 1, disabled: true } %>
+        <%= f.error_message_on :contract_interval_length %>
+        <%= f.select :contract_interval_units, options_for_select(SolidusSubscriptions::SubscriptionPreset.contract_interval_units.keys, @subscription_preset.contract_interval_units || :months), {:include_blank => true}, class: 'custom-select', disabled: true %>
+        <%= f.error_message_on :contract_interval_units %>
+      </div>
+
+      <div id="new_subscription_preset_active" class="field col-3">
+        <%= f.field_container :active do %>
+          <%= label_tag :active, SolidusSubscriptions::SubscriptionPreset.human_attribute_name(:active), class: 'required' %>
+          <div> <%= f.label :active, "Yes" %> <%= f.radio_button :active, true, disabled: true %> </div>
+          <div> <%= f.label :active, "No" %> <%= f.radio_button :active, false, disabled: true %> </div>
+          <%= f.error_message_on :active %>
+        <% end %>
+      </div>
+    </div>
+
+  </div>

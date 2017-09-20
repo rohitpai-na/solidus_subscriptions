@@ -1,3 +1,10 @@
-<% if can? :admin, SolidusSubscriptions::Subscription %>
-  <%= tab :subscriptions, icon: 'repeat' %>
+<% if try_spree_current_user && can?(:admin, SolidusSubscriptions::Subscription) %>
+    <%=
+      tab(
+        *[:subscriptions, :subscription_presets],
+        icon: 'repeat'
+      ) do
+    %>
+      <%- render partial: 'spree/admin/shared/subscription_sub_menu' %>
+      <%- end %>
 <% end %>
