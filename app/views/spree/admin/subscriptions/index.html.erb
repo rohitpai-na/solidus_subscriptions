@@ -98,6 +98,7 @@
   <table id="listing_subscriptions" class="index">
     <thead>
       <tr>
+        <th><%= sort_link(@search, :number, SolidusSubscriptions::Subscription.human_attribute_name(:number)) %></th>
         <th><%= sort_link(@search, :created_at, SolidusSubscriptions::Subscription.human_attribute_name(:created_at)) %></th>
         <th><%= sort_link(@search, :user_email, SolidusSubscriptions::Subscription.human_attribute_name(:user)) %></th>
         <th><%= sort_link(@search, :actionable_date, SolidusSubscriptions::Subscription.human_attribute_name(:actionable_date)) %></th>

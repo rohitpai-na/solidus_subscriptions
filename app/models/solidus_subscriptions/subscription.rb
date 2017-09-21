@@ -27,6 +27,7 @@ module SolidusSubscriptions
       inverse_of: :subscriptions
 
     # validates :skip_count, :successive_skip_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validates :number, presence: true, uniqueness: { allow_blank: true }
 
     # accepts_nested_attributes_for :shipping_address
     # accepts_nested_attributes_for :line_item, allow_destroy: true
@@ -36,9 +37,11 @@ module SolidusSubscriptions
     delegate :delivery_interval, :delivery_interval_units, :delivery_interval_length,
       :bill_interval, :bill_interval_units, :bill_interval_length,
       :contract_interval, :contract_interval_units, :contract_interval_length,
-      :interval, :interval_units, :interval_length,
+      :interval, :interval_units, :interval_length, :delivery_category_continuous?,
       :unit_price, :unit_price_interval_units, :unit_price_interval_length,
       to: :subscription_preset
+
+    make_permalink field: :number, length: 11, prefix: 'O'
 
     # Find all subscriptions that are "actionable"; that is, ones that have an
     # actionable_date in the past and are not invalid or canceled.

@@ -1,4 +1,8 @@
 <%= content_tag :tr, class: cycle('odd', 'even') do %>
+  <%= content_tag :td, class: 'align-center' do %>
+    <%= link_to subscription.number, admin_subscription_path(subscription) %>
+  <% end %>
+
   <%= content_tag :td, l(subscription.created_at.to_date), class: 'align-center' %>
 
   <%= content_tag :td, class: 'align-center' do %>

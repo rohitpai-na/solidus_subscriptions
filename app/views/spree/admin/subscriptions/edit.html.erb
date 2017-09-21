@@ -13,7 +13,7 @@
 <% end %>
 
 <%= form_for @subscription, url: spree.admin_subscription_path(@subscription) do |f| %>
-  <% if f.object.respond_to?(:line_items) %>
+  <% if f.object.respond_to?(:line_item) %>
     <%= render "form", f: f %>
   <% else %>
     <%= render "legacy_form",  f: f %>
